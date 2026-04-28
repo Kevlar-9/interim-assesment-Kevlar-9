@@ -21,7 +21,7 @@ if (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost')) {
 }
 
 mongoose
-  .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoUri)
   .then(() => console.log('DB connected'))
   .catch((err) => {
     console.error('MongoDB connection error:', err.message);
