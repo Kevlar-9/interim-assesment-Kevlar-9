@@ -9,7 +9,19 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: 'http://your-frontend-url.com', credentials: true }));
 
-mongoose.connect(process.env.MONGO_URI).then(() => console.log('DB connected'));
+const mongoUri = process.env.MONGO_URI;
+if (!mongoUri) {
+  console.error('Missing MONGO_URI environment variable. Set MONGO_URI in Render environment settings.');
+  process.exit(1);
+}
+
+mongoose
+  .connect(mongoUri)
+  .then(() => console.log('DB connected'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err.message);
+    process.exit(1);
+  });
 
 app.use('/auth', require('./routes/authRoutes'));
 app.use('/profile', require('./routes/userRoutes'));
