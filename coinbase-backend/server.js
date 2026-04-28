@@ -9,14 +9,19 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: 'http://your-frontend-url.com', credentials: true }));
 
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
 if (!mongoUri) {
-  console.error('Missing MONGO_URI environment variable. Set MONGO_URI in Render environment settings.');
+  console.error('Missing MongoDB URI environment variable. Set MONGO_URI in Render environment settings, or MONGODB_URI if you prefer that name.');
+  process.exit(1);
+}
+
+if (mongoUri.includes('127.0.0.1') || mongoUri.includes('localhost')) {
+  console.error('MongoDB URI looks like a local database. Render cannot connect to localhost. Please set MONGO_URI to a remote MongoDB connection string.');
   process.exit(1);
 }
 
 mongoose
-  .connect(mongoUri)
+  .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('DB connected'))
   .catch((err) => {
     console.error('MongoDB connection error:', err.message);
